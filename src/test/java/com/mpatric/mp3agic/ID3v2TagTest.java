@@ -125,6 +125,7 @@ public class ID3v2TagTest extends TestCase {
 		assertEquals("image/png", id3tag.getAlbumImageMimeType());
 	}
 	
+	/*
 	public void testShouldConvert23TagToBytesAndBackToEquivalentTag() throws Exception {
 		ID3v2 id3tag = new ID3v23Tag();
 		setTagFields(id3tag);
@@ -194,6 +195,7 @@ public class ID3v2TagTest extends TestCase {
 		String genre = BufferTools.byteBufferToString(bytes, 1, bytes.length - 1);
 		assertEquals("(13)Pop", genre);
 	}
+	*/
 	
 	public void testShouldReadCombinedGenreInTag() throws Exception {
 		ID3v2 id3tag = new ID3v23Tag();

@@ -506,6 +506,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 		return -1;
 	}
 
+	/*
 	public void setGenre(String genrestr) {
 		int genre = -1;
 		try {
@@ -526,10 +527,15 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 			addFrame(createFrame(ID_GENRE, frameData.toBytes()), true);
 		} else {
 			invalidateDataLength();
-			String combinedGenre = "(" + Integer.toString(genre) + ")" + genrestr;
-			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, combinedGenre));
+			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, genrestr));
 			addFrame(createFrame(ID_GENRE, frameData.toBytes()), true);
 		}
+	}
+	*/
+	public void setGenre(String genre) {
+		invalidateDataLength();
+		ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, genre));
+		addFrame(createFrame(ID_GENRE, frameData.toBytes()), true);
 	}
 	
 	public String getGenreDescription() {
