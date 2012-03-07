@@ -203,6 +203,49 @@ public class ID3Wrapper {
 		}
 	}
 
+	public void setCompilation(String compilation) {
+		if (id3v2Tag != null) {
+			id3v2Tag.setCompilation(compilation);
+		}
+	}
+
+	public boolean isCompilation() {
+		if (id3v2Tag != null) {
+			return id3v2Tag.isCompilation();
+		} else {
+			return false;
+		}
+	}
+
+	public void setDisc(String disc) {
+		if (id3v2Tag != null) {
+			id3v2Tag.setDisc(disc);
+		}
+	}
+
+	public String getDisc() {
+		if (id3v2Tag != null) {
+			return id3v2Tag.getDisc();
+		} else {
+			return null;
+		}
+	}
+
+	public void setIsrc(String isrc) {
+		if (id3v2Tag != null) {
+			id3v2Tag.setIsrc(isrc);
+		}
+	}
+
+	public String getIsrc() {
+		if (id3v2Tag != null) {
+			return id3v2Tag.getIsrc();
+		} else {
+			return null;
+		}
+	}
+
+	
 	public String getCopyright() {
 		if (id3v2Tag != null) {
 			return id3v2Tag.getCopyright();

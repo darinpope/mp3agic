@@ -28,6 +28,15 @@ public interface ID3v2 extends ID3v1 {
 	String getCopyright();
 	void setCopyright(String copyright);
 	
+	boolean isCompilation();
+	void setCompilation(String compilation);
+
+	String getIsrc();
+	void setIsrc(String isrc);
+
+	String getDisc();
+	void setDisc(String disc);
+
 	String getUrl();
 	void setUrl(String url);
 	

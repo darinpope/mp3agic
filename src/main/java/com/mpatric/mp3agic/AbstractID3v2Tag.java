@@ -21,6 +21,9 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	public static final String ID_ARTIST = "TPE1";
 	public static final String ID_ALBUM_ARTIST = "TPE2";
 	public static final String ID_TRACK = "TRCK";
+	public static final String ID_COMPILATION = "TCMP";
+	public static final String ID_DISC = "TPOS";
+	public static final String ID_ISRC = "TSRC";
 	public static final String ID_IMAGE_OBSELETE = "PIC";
 	public static final String ID_ENCODER_OBSELETE = "TEN";
 	public static final String ID_URL_OBSELETE = "WXX";
@@ -36,6 +39,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	public static final String ID_ARTIST_OBSELETE = "TP1";
 	public static final String ID_ALBUM_ARTIST_OBSELETE = "TP2";
 	public static final String ID_TRACK_OBSELETE = "TRK";
+	public static final String ID_DISC_OBSOLETE = "TPA";
 	
 	protected static final String TAG = "ID3";
 	protected static final String FOOTER_TAG = "3DI";
@@ -343,6 +347,62 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 			invalidateDataLength();
 			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, track));
 			addFrame(createFrame(ID_TRACK, frameData.toBytes()), true);
+		}
+	}
+
+
+	public String getDisc() {
+		ID3v2TextFrameData frameData;
+		if (obseleteFormat) frameData = extractTextFrameData(ID_DISC_OBSOLETE);
+		else frameData = extractTextFrameData(ID_DISC);
+		if (frameData != null && frameData.getText() != null) return frameData.getText().toString();
+		return null;
+	}
+
+	public void setDisc(String disc) {
+		if (disc != null && disc.length() > 0) {
+			invalidateDataLength();
+			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, disc));
+			addFrame(createFrame(ID_DISC, frameData.toBytes()), true);
+		}
+	}
+
+	public boolean isCompilation() {
+		ID3v2TextFrameData frameData;
+		frameData = extractTextFrameData(ID_COMPILATION);
+		String value = null;
+		if (frameData != null && frameData.getText() != null) {
+			value = frameData.getText().toString();
+		}
+		if(value != null && value == "1") {
+			return true;
+		}
+		return false;
+	}
+
+	public void setCompilation(String compilation) {
+		if (compilation != null && compilation.length() > 0) {
+			invalidateDataLength();
+			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, compilation));
+			addFrame(createFrame(ID_COMPILATION, frameData.toBytes()), true);
+		}
+	}
+	
+	public String getIsrc() {
+		ID3v2TextFrameData frameData;
+		frameData = extractTextFrameData(ID_ISRC);
+		String value = null;
+		if (frameData != null && frameData.getText() != null) {
+			return frameData.getText().toString();
+		}
+		return null;
+	}
+
+	public void setIsrc(String isrc) {
+		if (isrc != null && isrc.length() > 0) {
+			invalidateDataLength();
+			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, isrc));
+			addFrame(createFrame(ID_ISRC, frameData.toBytes()), true);
 		}
 	}
 
