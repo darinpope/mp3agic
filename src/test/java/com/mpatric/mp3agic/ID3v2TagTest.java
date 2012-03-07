@@ -250,7 +250,7 @@ public class ID3v2TagTest extends TestCase {
 		id3tag.setTitle("TITLE");
 		id3tag.setAlbum("ALBUM");
 		id3tag.setYear("1954");
-		id3tag.setGenre(0x0d);
+		id3tag.setGenre(String.valueOf(0x0d));
 		id3tag.setComment("COMMENT");
 		id3tag.setComposer("COMPOSER");
 		id3tag.setOriginalArtist("ORIGINALARTIST");

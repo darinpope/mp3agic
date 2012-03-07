@@ -93,7 +93,7 @@ public class Mp3Details extends BaseApp {
 			showField(buffer, "Album", id3v2tag.getAlbum());
 			showField(buffer, "Title", id3v2tag.getTitle());
 			showField(buffer, "Year", id3v2tag.getYear());
-			showField(buffer, "Genre", id3v2tag.getGenreDescription());
+			showField(buffer, "Genre", "(" + String.valueOf(id3v2tag.getGenre()) + ") " + id3v2tag.getGenreDescription());
 			showField(buffer, "Comment", id3v2tag.getComment());
 			showField(buffer, "Composet", id3v2tag.getComposer());
 			showField(buffer, "Original Artist", id3v2tag.getOriginalArtist());

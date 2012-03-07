@@ -20,7 +20,7 @@ public interface ID3v1 {
 	void setYear(String year);
 	
 	int getGenre();
-	void setGenre(int genre);
+	void setGenre(String genre);
 	String getGenreDescription();
 	
 	String getComment();

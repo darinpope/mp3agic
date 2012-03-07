@@ -107,7 +107,7 @@ public class ID3v1TagTest extends TestCase {
 		id3v1tag.setYear("2001");
 		id3v1tag.setComment("COMMENT");
 		id3v1tag.setTrack("1");
-		id3v1tag.setGenre(0x0d);
+		id3v1tag.setGenre(String.valueOf(0x0d));
 		byte[] expectedBuffer = BufferTools.stringToByteBuffer(VALID_TAG_WITH_WHITESPACE, 0, VALID_TAG_WITH_WHITESPACE.length());
 		replaceSpacesWithNulls(expectedBuffer);
 		expectedBuffer[expectedBuffer.length - 3] = 0x00;
@@ -124,7 +124,7 @@ public class ID3v1TagTest extends TestCase {
 		id3v1tag.setYear("2001");
 		id3v1tag.setComment("COMMENT");
 		id3v1tag.setTrack("254");
-		id3v1tag.setGenre(0x8d);
+		id3v1tag.setGenre(String.valueOf(0x8d));
 		byte[] expectedBuffer = BufferTools.stringToByteBuffer(VALID_TAG_WITH_WHITESPACE, 0, VALID_TAG_WITH_WHITESPACE.length());
 		replaceSpacesWithNulls(expectedBuffer);
 		expectedBuffer[expectedBuffer.length - 3] = 0x00;
@@ -154,7 +154,7 @@ public class ID3v1TagTest extends TestCase {
 		id3tag.setTitle("TITLE");
 		id3tag.setAlbum("ALBUM");
 		id3tag.setYear("1997");
-		id3tag.setGenre(13);
+		id3tag.setGenre(String.valueOf(13));
 		id3tag.setComment("COMMENT");
 		byte[] data = id3tag.toBytes();
 		ID3v1 id3tagCopy = new ID3v1Tag(data);

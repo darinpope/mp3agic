@@ -123,7 +123,7 @@ public class ID3Wrapper {
 		}
 	}
 
-	public void setGenre(int genre) {
+	public void setGenre(String genre) {
 		if (id3v2Tag != null) {
 			id3v2Tag.setGenre(genre);
 		}

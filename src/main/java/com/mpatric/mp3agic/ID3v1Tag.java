@@ -181,8 +181,13 @@ public class ID3v1Tag implements ID3v1 {
 		return genre;
 	}
 
-	public void setGenre(int genre) {
-		this.genre = genre;
+	public void setGenre(String genre) {
+		int ngenre = -1;
+		try {
+			ngenre = Integer.parseInt(genre);
+		} catch (NumberFormatException nfe) {
+		}
+		this.genre = ngenre;
 	}
 
 	public String getGenreDescription() {

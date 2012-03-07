@@ -101,7 +101,7 @@ public class Mp3Retag extends BaseApp {
 		newId3Wrapper.setArtist(trimField(oldId3Wrapper.getArtist()));
 		newId3Wrapper.setAlbum(trimField(oldId3Wrapper.getAlbum()));
 		newId3Wrapper.setYear(trimField(oldId3Wrapper.getYear()));
-		newId3Wrapper.setGenre(oldId3Wrapper.getGenre());
+		newId3Wrapper.setGenre(String.valueOf(oldId3Wrapper.getGenre()));
 		if (comment != null) {
 			newId3Wrapper.setComment(trimField(comment));
 		} else {

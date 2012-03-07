@@ -71,7 +71,7 @@ public class Mp3RenameTest extends TestCase {
 			id3Wrapper.setTitle(title);
 			id3Wrapper.setAlbum(album);
 			id3Wrapper.setYear(year);
-			id3Wrapper.setGenre(genre);
+			id3Wrapper.setGenre(String.valueOf(genre));
 		}
 
 		protected ID3Wrapper createId3Wrapper(String filename) throws IOException, UnsupportedTagException, InvalidDataException {
