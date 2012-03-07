@@ -47,7 +47,7 @@ public class ID3v1TagTest extends TestCase {
 		assertEquals("COMMENT12345678901234567890123", id3v1tag.getComment());
 		assertEquals(null, id3v1tag.getTrack());
 		assertEquals(0x8D, id3v1tag.getGenre());
-		assertEquals("Synthpop", id3v1tag.getGenreDescription());
+		assertEquals("Christian Rock", id3v1tag.getGenreDescription());
 	}
 	
 	public void testShouldExtractMaximumLengthFieldsFromValid11Tag() throws NoSuchTagException {

@@ -236,7 +236,7 @@ public class ID3v2TagTest extends TestCase {
 		assertEquals("4/15", id3tag.getTrack());
 		assertEquals("image/png", id3tag.getAlbumImageMimeType());
 		assertEquals(40, id3tag.getGenre());
-		assertEquals("Alt Rock", id3tag.getGenreDescription());
+		assertEquals("AlternRock", id3tag.getGenreDescription());
 		assertEquals("NAME1234567890123456789012345678901234567890", id3tag.getTitle());
 		assertEquals("ARTIST1234567890123456789012345678901234567890", id3tag.getArtist());
 		assertEquals("COMPOSER1234567890123456789012345678901234567890", id3tag.getComposer());
