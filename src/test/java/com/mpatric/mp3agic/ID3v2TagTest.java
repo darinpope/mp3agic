@@ -1,7 +1,6 @@
 package com.mpatric.mp3agic;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,7 @@ public class ID3v2TagTest extends TestCase {
 	}
 	
 	public void testShouldSortId3TagsAlphabetically() throws Exception {
-		byte[] buffer = loadFile("src/test/resources/v1andv23tags.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/v1andv23tags.mp3");
 		ID3v2 id3v2tag = ID3v2TagFactory.createTag(buffer);
 		Map<String, ID3v2FrameSet> frameSets = id3v2tag.getFrameSets();
 		Iterator<ID3v2FrameSet> frameSetIterator = frameSets.values().iterator();
@@ -79,7 +78,7 @@ public class ID3v2TagTest extends TestCase {
 	}
 
 	public void testShouldReadFramesFromMp3With32Tag() throws IOException, NoSuchTagException, UnsupportedTagException, InvalidDataException {
-		byte[] buffer = loadFile("src/test/resources/v1andv23tags.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/v1andv23tags.mp3");
 		ID3v2 id3v2tag = ID3v2TagFactory.createTag(buffer);
 		assertEquals("3.0", id3v2tag.getVersion());
 		assertEquals(0x44B, id3v2tag.getLength());
@@ -99,14 +98,14 @@ public class ID3v2TagTest extends TestCase {
 	}
 
 	public void testShouldReadId3v2WithFooter() throws IOException, NoSuchTagException, UnsupportedTagException, InvalidDataException {
-		byte[] buffer = loadFile("src/test/resources/v1andv24tags.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/v1andv24tags.mp3");
 		ID3v2 id3v2tag = ID3v2TagFactory.createTag(buffer);
 		assertEquals("4.0", id3v2tag.getVersion());
 		assertEquals(0x44B, id3v2tag.getLength());
 	}
 	
 	public void testShouldReadTagFieldsFromMp3With32tag() throws Exception {
-		byte[] buffer = loadFile("src/test/resources/v1andv23tagswithalbumimage.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/v1andv23tagswithalbumimage.mp3");
 		ID3v2 id3tag = ID3v2TagFactory.createTag(buffer);
 		assertEquals("1", id3tag.getTrack());
 		assertEquals("ARTIST123456789012345678901234", id3tag.getArtist());
@@ -207,14 +206,14 @@ public class ID3v2TagTest extends TestCase {
 	}
 	
 	public void testShouldGetCommentAndItunesComment() throws Exception {
-		byte[] buffer = loadFile("src/test/resources/withitunescomment.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/withitunescomment.mp3");
 		ID3v2 id3tag = ID3v2TagFactory.createTag(buffer);
 		assertEquals("COMMENT123456789012345678901", id3tag.getComment());
 		assertEquals(" 00000A78 00000A74 00000C7C 00000C6C 00000000 00000000 000051F7 00005634 00000000 00000000", id3tag.getItunesComment());
 	}
 	
 	public void testShouldReadFramesFromMp3WithObselete32Tag() throws Exception {
-		byte[] buffer = loadFile("src/test/resources/obselete.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/obselete.mp3");
 		ID3v2 id3v2tag = ID3v2TagFactory.createTag(buffer);
 		assertEquals("2.0", id3v2tag.getVersion());
 		assertEquals(0x3c5a2, id3v2tag.getLength());
@@ -232,7 +231,7 @@ public class ID3v2TagTest extends TestCase {
 	}
 	
 	public void testShouldReadTagFieldsFromMp3WithObselete32tag() throws Exception {
-		byte[] buffer = loadFile("src/test/resources/obselete.mp3");
+		byte[] buffer = TestHelper.loadFile("src/test/resources/obselete.mp3");
 		ID3v2 id3tag = ID3v2TagFactory.createTag(buffer);
 		assertEquals("2009", id3tag.getYear());
 		assertEquals("4/15", id3tag.getTrack());
@@ -244,6 +243,30 @@ public class ID3v2TagTest extends TestCase {
 		assertEquals("COMPOSER1234567890123456789012345678901234567890", id3tag.getComposer());
 		assertEquals("ALBUM1234567890123456789012345678901234567890", id3tag.getAlbum());
 		assertEquals("COMMENTS1234567890123456789012345678901234567890", id3tag.getComment());
+	}
+	
+	public void testShouldReadTagFieldsWithUnicodeDataFromMp3() throws Exception {
+		byte[] buffer = TestHelper.loadFile("src/test/resources/v23unicodetags.mp3");
+		ID3v2 id3tag = ID3v2TagFactory.createTag(buffer);
+		assertEquals("\u03B3\u03B5\u03B9\u03AC \u03C3\u03BF\u03C5", id3tag.getArtist()); // greek
+		assertEquals("\u4E2D\u6587", id3tag.getTitle()); // chinese
+		assertEquals("\u3053\u3093\u306B\u3061\u306F", id3tag.getAlbum()); // japanese
+		assertEquals("\u0AB9\u0AC7\u0AB2\u0ACD\u0AB2\u0ACB", id3tag.getComposer()); // gujarati
+	}
+	
+	public void testShouldSetTagFieldsWithUnicodeDataAndSpecifiedEncodingCorrectly() throws Exception {
+		ID3v2 id3tag = new ID3v23Tag();
+		id3tag.setArtist("\u03B3\u03B5\u03B9\u03AC \u03C3\u03BF\u03C5");
+		id3tag.setTitle("\u4E2D\u6587");
+		id3tag.setAlbum("\u3053\u3093\u306B\u3061\u306F");
+		id3tag.setComment("\u03C3\u03BF\u03C5");
+		id3tag.setComposer("\u0AB9\u0AC7\u0AB2\u0ACD\u0AB2\u0ACB");
+		id3tag.setOriginalArtist("\u03B3\u03B5\u03B9\u03AC");
+		id3tag.setCopyright("\u03B3\u03B5");
+		id3tag.setUrl("URL");
+		id3tag.setEncoder("\u03B9\u03AC");
+		byte[] albumImage = TestHelper.loadFile("src/test/resources/image.png");
+		id3tag.setAlbumImage(albumImage, "image/png");
 	}
 
 	private void setTagFields(ID3v2 id3tag) throws IOException {
@@ -259,15 +282,8 @@ public class ID3v2TagTest extends TestCase {
 		id3tag.setCopyright("COPYRIGHT");
 		id3tag.setUrl("URL");
 		id3tag.setEncoder("ENCODER");
-		byte[] albumImage = loadFile("src/test/resources/image.png");
+		byte[] albumImage = TestHelper.loadFile("src/test/resources/image.png");
 		id3tag.setAlbumImage(albumImage, "image/png");
-	}
-
-	private byte[] loadFile(String filename) throws IOException {
-		RandomAccessFile file = new RandomAccessFile(filename, "r");
-		byte[] buffer = new byte[(int) file.length()];
-		file.read(buffer);
-		return buffer;
 	}
 	
 	private ID3v2 createTag(byte[] buffer) throws NoSuchTagException, UnsupportedTagException, InvalidDataException {

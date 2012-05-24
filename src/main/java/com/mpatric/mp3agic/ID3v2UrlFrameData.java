@@ -1,5 +1,7 @@
 package com.mpatric.mp3agic;
 
+import java.io.UnsupportedEncodingException;
+
 public class ID3v2UrlFrameData extends AbstractID3v2FrameData {
 
 	protected String url;
@@ -26,33 +28,44 @@ public class ID3v2UrlFrameData extends AbstractID3v2FrameData {
 			if (bytes[marker] == 0) break;
 		}
 		description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 1, marker - 1));
+		marker += description.getTerminator().length;
 		int length = 0;
-		for (int i = marker + 1; i < bytes.length; i++) {
+		for (int i = marker; i < bytes.length; i++) {
 			if (bytes[i] == 0) break;
 			length++;
 		}
-		url = BufferTools.byteBufferToString(bytes, marker + 1, length);
+		try {
+			url = BufferTools.byteBufferToString(bytes, marker, length);
+		} catch (UnsupportedEncodingException e) {
+			url = "";
+		}
 	}
 	
 	protected byte[] packFrameData() {
 		byte[] bytes = new byte[getLength()];
 		if (description != null) bytes[0] = description.getTextEncoding();
 		else bytes[0] = 0;
-		int descriptionLength = 0;
-		if (description != null && description.toBytes().length > 0) {
-			descriptionLength = description.toBytes().length;
-			BufferTools.copyIntoByteBuffer(description.toBytes(), 0, descriptionLength, bytes, 1);
+		int marker = 1;
+		if (description != null) {
+			byte[] descriptionBytes = description.toBytes(true, true);
+			BufferTools.copyIntoByteBuffer(descriptionBytes, 0, descriptionBytes.length, bytes, marker);
+			marker += descriptionBytes.length;
+		} else {
+			bytes[marker++] = 0;
 		}
-		bytes[descriptionLength + 1] = 0;
 		if (url != null && url.length() > 0) {
-			BufferTools.stringIntoByteBuffer(url, 0, url.length(), bytes, descriptionLength + 2);
+			try {
+				BufferTools.stringIntoByteBuffer(url, 0, url.length(), bytes, marker);
+			} catch (UnsupportedEncodingException e) {
+			}
 		}
 		return bytes;
 	}
 	
 	protected int getLength() {
-		int length = 2;
-		if (description != null) length += description.toBytes().length;
+		int length = 1;
+		if (description != null) length += description.toBytes(true, true).length;
+		else length++;
 		if (url != null) length += url.length();
 		return length;
 	}

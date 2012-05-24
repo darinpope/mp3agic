@@ -1,32 +1,55 @@
 package com.mpatric.mp3agic;
 
+import java.io.UnsupportedEncodingException;
+
 public class BufferTools {
-
-	public static String byteBufferToString(byte[] bytes, int offset, int length) {
-		if (length < 1) return "";
-		StringBuffer stringBuffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			char ch;
-			if (bytes[offset + i] >= 0) ch = (char)bytes[offset + i];
-			else ch = (char)(bytes[offset + i] + 256);			
-			stringBuffer.append(ch);
+	
+	protected static final String defaultCharsetName = "ISO-8859-1";
+	
+	public static String byteBufferToStringIgnoringEncodingIssues(byte[] bytes, int offset, int length) {
+		try {
+			return byteBufferToString(bytes, offset, length, defaultCharsetName);
+		} catch (UnsupportedEncodingException e) {
+			return null;
 		}
-		return stringBuffer.toString();
 	}
-
-	public static byte[] stringToByteBuffer(String s, int offset, int length) {
+	
+	public static String byteBufferToString(byte[] bytes, int offset, int length) throws UnsupportedEncodingException {
+		return byteBufferToString(bytes, offset, length, defaultCharsetName);
+	}
+	
+	public static String byteBufferToString(byte[] bytes, int offset, int length, String charsetName) throws UnsupportedEncodingException {
+		if (length < 1) return "";
+		return new String(bytes, offset, length, charsetName);
+	}
+	
+	public static byte[] stringToByteBufferIgnoringEncodingIssues(String s, int offset, int length) {
+		try {
+			return stringToByteBuffer(s, offset, length);
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
+	}
+	
+	public static byte[] stringToByteBuffer(String s, int offset, int length) throws UnsupportedEncodingException {
+		return stringToByteBuffer(s, offset, length, defaultCharsetName);
+	}
+	
+	public static byte[] stringToByteBuffer(String s, int offset, int length, String charsetName) throws UnsupportedEncodingException {
 		String stringToCopy = s.substring(offset, offset + length);
-		byte[] bytes = stringToCopy.getBytes();
+		byte[] bytes = stringToCopy.getBytes(charsetName);
 		return bytes;
 	}
 	
-	public static void stringIntoByteBuffer(String s, int offset, int length, byte[] bytes, int destOffset) {
-		for (int i = 0; i < length; i++) {
-			char ch = s.charAt(offset + i);
-			byte by;
-			if (ch < 128) by = (byte)ch;
-			else by = (byte)(ch - 256);
-			bytes[destOffset + i] = by;
+	public static void stringIntoByteBuffer(String s, int offset, int length, byte[] bytes, int destOffset) throws UnsupportedEncodingException {
+		stringIntoByteBuffer(s, offset, length, bytes, destOffset, defaultCharsetName);
+	}
+	
+	public static void stringIntoByteBuffer(String s, int offset, int length, byte[] bytes, int destOffset, String charsetName) throws UnsupportedEncodingException {
+		String stringToCopy = s.substring(offset, offset + length);
+		byte[] srcBytes = stringToCopy.getBytes(charsetName);
+		if (srcBytes.length > 0) {
+			System.arraycopy(srcBytes, 0, bytes, destOffset, srcBytes.length);
 		}
 	}
 
@@ -69,7 +92,7 @@ public class BufferTools {
 	}
 	
 	public static int shiftByte(byte c, int places) {
-		int i = c & 0xFF;
+		int i = c & 0xff;
 		if (places < 0) {
 			return i << -places;
 		} else if (places > 0) {
@@ -79,7 +102,7 @@ public class BufferTools {
 	}
 	
 	public static int unpackInteger(byte b1, byte b2, byte b3, byte b4) {
-		int value = b4 & 0xFF;
+		int value = b4 & 0xff;
 		value += BufferTools.shiftByte(b3, -8);
 		value += BufferTools.shiftByte(b2, -16);
 		value += BufferTools.shiftByte(b1, -24);
@@ -88,18 +111,18 @@ public class BufferTools {
 	
 	public static byte[] packInteger(int i) {
 		byte[] bytes = new byte[4];
-		bytes[3] = (byte) (i & 0xFF);
-		bytes[2] = (byte) ((i >> 8) & 0xFF);
-		bytes[1] = (byte) ((i >> 16) & 0xFF);
-		bytes[0] = (byte) ((i >> 24) & 0xFF);
+		bytes[3] = (byte) (i & 0xff);
+		bytes[2] = (byte) ((i >> 8) & 0xff);
+		bytes[1] = (byte) ((i >> 16) & 0xff);
+		bytes[0] = (byte) ((i >> 24) & 0xff);
 		return bytes;
 	}
 	
 	public static int unpackSynchsafeInteger(byte b1, byte b2, byte b3, byte b4) {
-		int value = ((byte)(b4 & 0x7F));
-		value += shiftByte((byte)(b3 & 0x7F), -7);
-		value += shiftByte((byte)(b2 & 0x7F), -14);
-		value += shiftByte((byte)(b1 & 0x7F), -21);
+		int value = ((byte)(b4 & 0x7f));
+		value += shiftByte((byte)(b3 & 0x7f), -7);
+		value += shiftByte((byte)(b2 & 0x7f), -14);
+		value += shiftByte((byte)(b1 & 0x7f), -21);
 		return value;
 	}
 	
@@ -110,50 +133,53 @@ public class BufferTools {
 	}
 	
 	public static void packSynchsafeInteger(int i, byte[] bytes, int offset) {
-		bytes[offset + 3] = (byte) (i & 0x7F);
-		bytes[offset + 2] = (byte) ((i >> 7) & 0x7F);
-		bytes[offset + 1] = (byte) ((i >> 14) & 0x7F);
-		bytes[offset + 0] = (byte) ((i >> 21) & 0x7F);
+		bytes[offset + 3] = (byte) (i & 0x7f);
+		bytes[offset + 2] = (byte) ((i >> 7) & 0x7f);
+		bytes[offset + 1] = (byte) ((i >> 14) & 0x7f);
+		bytes[offset + 0] = (byte) ((i >> 21) & 0x7f);
 	}
 
 	public static byte[] copyBuffer(byte[] bytes, int offset, int length) {
 		byte[] copy = new byte[length];
-		for (int i = 0; i < length; i++) {
-			copy[i] = bytes[offset + i];
+		if (length > 0) {
+			System.arraycopy(bytes, offset, copy, 0, length);
 		}
 		return copy;
 	}
 	
 	public static void copyIntoByteBuffer(byte[] bytes, int offset, int length, byte[] destBuffer, int destOffset) {
-		for (int i = offset; i < length; i++) {
-			destBuffer[destOffset + i] = bytes[i];
+		if (length > 0) {
+			System.arraycopy(bytes, offset, destBuffer, destOffset, length);
 		}
 	}
 	
 	public static int sizeUnsynchronisationWouldAdd(byte[] bytes) {
 		int count = 0; 
 		for (int i = 0; i < bytes.length - 1; i++) {
-			if (bytes[i] == -0x01 && ((bytes[i + 1] & -0x20) == -0x20 || bytes[i + 1] == 0)) {
+			if (bytes[i] == (byte)0xff && ((bytes[i + 1] & (byte)0xe0) == (byte)0xe0 || bytes[i + 1] == 0)) {
 				count++;
 			}
 		}
-		if (bytes.length > 0 && bytes[bytes.length - 1] == -0x01) count++;
+		if (bytes.length > 0 && bytes[bytes.length - 1] == (byte)0xff) count++;
 		return count;
 	}
 
 	public static byte[] unsynchroniseBuffer(byte[] bytes) {
+		// unsynchronisation is replacing instances of:
+		// 11111111 111xxxxx with 11111111 00000000 111xxxxx and
+		// 11111111 00000000 with 11111111 00000000 00000000 
 		int count = sizeUnsynchronisationWouldAdd(bytes);
 		if (count == 0) return bytes;
 		byte[] newBuffer = new byte[bytes.length + count];
 		int j = 0;
 		for (int i = 0; i < bytes.length - 1; i++) {
 			newBuffer[j++] = bytes[i];
-			if (bytes[i] == -0x01 && ((bytes[i + 1] & -0x20) == -0x20 || bytes[i + 1] == 0)) {
+			if (bytes[i] == (byte)0xff && ((bytes[i + 1] & (byte)0xe0) == (byte)0xe0 || bytes[i + 1] == 0)) {
 				newBuffer[j++] = 0;
 			}
 		}
 		newBuffer[j++] = bytes[bytes.length - 1];
-		if (bytes[bytes.length - 1] == -0x01) {
+		if (bytes[bytes.length - 1] == (byte)0xff) {
 			newBuffer[j++] = 0;
 		}
 		return newBuffer;
@@ -162,22 +188,25 @@ public class BufferTools {
 	public static int sizeSynchronisationWouldSubtract(byte[] bytes) {
 		int count = 0; 
 		for (int i = 0; i < bytes.length - 2; i++) {
-			if (bytes[i] == -0x01 && bytes[i + 1] == 0 && ((bytes[i + 2] & -0x20) == -0x20 || bytes[i + 2] == 0)) {
+			if (bytes[i] == (byte)0xff && bytes[i + 1] == 0 && ((bytes[i + 2] & (byte)0xe0) == (byte)0xe0 || bytes[i + 2] == 0)) {
 				count++;
 			}
 		}
-		if (bytes.length > 1 && bytes[bytes.length - 2] == -0x01 && bytes[bytes.length - 1] == 0) count++;
+		if (bytes.length > 1 && bytes[bytes.length - 2] == (byte)0xff && bytes[bytes.length - 1] == 0) count++;
 		return count;
 	}
 
 	public static byte[] synchroniseBuffer(byte[] bytes) {
+		// synchronisation is replacing instances of:
+		// 11111111 00000000 111xxxxx with 11111111 111xxxxx and
+		// 11111111 00000000 00000000 with 11111111 00000000
 		int count = sizeSynchronisationWouldSubtract(bytes);
 		if (count == 0) return bytes;
 		byte[] newBuffer = new byte[bytes.length - count];
 		int i = 0;
 		for (int j = 0; j < newBuffer.length - 1; j++) {
 			newBuffer[j] = bytes[i];
-			if (bytes[i] == -0x01 && bytes[i + 1] == 0 && ((bytes[i + 2] & -0x20) == -0x20 || bytes[i + 2] == 0)) {
+			if (bytes[i] == (byte)0xff && bytes[i + 1] == 0 && ((bytes[i + 2] & (byte)0xe0) == (byte)0xe0 || bytes[i + 2] == 0)) {
 				i++;
 			}
 			i++;

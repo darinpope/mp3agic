@@ -1,5 +1,7 @@
 package com.mpatric.mp3agic;
 
+import java.io.UnsupportedEncodingException;
+
 public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 
 	private static final String DEFAULT_LANGUAGE = "eng";
@@ -25,18 +27,23 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 	}
 	
 	protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
-		language = BufferTools.byteBufferToString(bytes, 1, 3);
+		try {
+			language = BufferTools.byteBufferToString(bytes, 1, 3);
+		} catch (UnsupportedEncodingException e) {
+			language = "";
+		}
 		int marker;
 		for (marker = 4; marker < bytes.length; marker++) {
 			if (bytes[marker] == 0) break;
 		}
 		description = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, 4, marker - 4));
+		marker += description.getTerminator().length;
 		int length = 0;
-		for (int i = marker + 1; i < bytes.length; i++) {
+		for (int i = marker; i < bytes.length; i++) {
 			if (bytes[i] == 0) break;
 			length++;
 		}
-		comment = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker + 1, length));
+		comment = new EncodedText(bytes[0], BufferTools.copyBuffer(bytes, marker, length));
 	}
 
 	protected byte[] packFrameData() {
@@ -49,25 +56,32 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
 		} else if (language.length() > 3) {
 			langPadded = language.substring(0, 3);
 		} else {
-			langPadded = BufferTools.padStringRight(language, 3, ' ');
+			langPadded = BufferTools.padStringRight(language, 3, '\00');
 		}
-		BufferTools.stringIntoByteBuffer(langPadded, 0, 3, bytes, 1);
-		int descriptionLength = 0;
-		if (description != null && description.toBytes().length > 0) {
-			descriptionLength = description.toBytes().length; 
-			BufferTools.copyIntoByteBuffer(description.toBytes(), 0, descriptionLength, bytes, 4);
+		try {
+			BufferTools.stringIntoByteBuffer(langPadded, 0, 3, bytes, 1);
+		} catch (UnsupportedEncodingException e) {
 		}
-		bytes[descriptionLength + 4] = 0;
-		if (comment != null && comment.toBytes().length > 0) {
-			BufferTools.copyIntoByteBuffer(comment.toBytes(), 0, comment.toBytes().length, bytes, descriptionLength + 5);
+		int marker = 4;
+		if (description != null) {
+			byte[] descriptionBytes = description.toBytes(true, true);
+			BufferTools.copyIntoByteBuffer(descriptionBytes, 0, descriptionBytes.length, bytes, marker);
+			marker += descriptionBytes.length;
+		} else {
+			bytes[marker++] = 0;
+		}
+		if (comment != null) {
+			byte[] commentBytes = comment.toBytes(true, false);
+			BufferTools.copyIntoByteBuffer(commentBytes, 0, commentBytes.length, bytes, marker);
 		}
 		return bytes;
 	}
 
 	protected int getLength() {
-		int length = 5;
-		if (description != null) length += description.toBytes().length;
-		if (comment != null) length += comment.toBytes().length;
+		int length = 4;
+		if (description != null) length += description.toBytes(true, true).length;
+		else length++;
+		if (comment != null) length += comment.toBytes(true, false).length;
 		return length;
 	}
 	

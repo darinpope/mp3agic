@@ -197,14 +197,14 @@ public class Mp3File extends FileWrapper {
 
 	private boolean isXingFrame(byte[] bytes, int offset) {
 		if (bytes.length >= offset + XING_MARKER_OFFSET_1 + 3) {
-			if ("Xing".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_1, 4))) return true;
-			if ("Info".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_1, 4))) return true;
+			if ("Xing".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_1, 4))) return true;
+			if ("Info".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_1, 4))) return true;
 			if (bytes.length >= offset + XING_MARKER_OFFSET_2 + 3) {
-				if ("Xing".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_2, 4))) return true;
-				if ("Info".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_2, 4))) return true;
+				if ("Xing".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_2, 4))) return true;
+				if ("Info".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_2, 4))) return true;
 				if (bytes.length >= offset + XING_MARKER_OFFSET_3 + 3) {
-					if ("Xing".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_3, 4))) return true;
-					if ("Info".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_3, 4))) return true;
+					if ("Xing".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_3, 4))) return true;
+					if ("Info".equals(BufferTools.byteBufferToStringIgnoringEncodingIssues(bytes, offset + XING_MARKER_OFFSET_3, 4))) return true;
 				}
 			}
 		}
@@ -363,6 +363,10 @@ public class Mp3File extends FileWrapper {
 		this.id3v1Tag = id3v1Tag;
 	}
 	
+	public void removeId3v1Tag() {
+		this.id3v1Tag = null;
+	}
+	
 	public boolean hasId3v2Tag() {
 		return id3v2Tag != null;
 	}
@@ -375,6 +379,10 @@ public class Mp3File extends FileWrapper {
 		this.id3v2Tag = id3v2Tag;
 	}
 	
+	public void removeId3v2Tag() {
+		this.id3v2Tag = null;
+	}
+	
 	public boolean hasCustomTag() {
 		return customTag != null;
 	}
@@ -385,6 +393,10 @@ public class Mp3File extends FileWrapper {
 
 	public void setCustomTag(byte[] customTag) {
 		this.customTag = customTag;
+	}
+	
+	public void removeCustomTag() {
+		this.customTag = null;
 	}
 	
 	public void save(String newFilename) throws IOException, NotSupportedException {
